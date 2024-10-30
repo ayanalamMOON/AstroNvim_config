@@ -1,6 +1,6 @@
 return {
   "nvim-neo-tree/neo-tree.nvim",
-  dependencies = {
+  specs = {
     { "nvim-lua/plenary.nvim", lazy = true },
     { "MunifTanjim/nui.nvim", lazy = true },
     {
@@ -55,6 +55,7 @@ return {
     },
   },
   cmd = "Neotree",
+  opts_extend = { "sources" },
   opts = function()
     local astro, get_icon = require "astrocore", require("astroui").get_icon
     local git_available = vim.fn.executable "git" == 1
@@ -171,7 +172,7 @@ return {
         width = 30,
         mappings = {
           ["<S-CR>"] = "system_open",
-          ["<Space>"] = false, -- disable space until we figure out which-key disabling
+          ["<Space>"] = false,
           ["[b"] = "prev_source",
           ["]b"] = "next_source",
           O = "system_open",
@@ -211,7 +212,7 @@ return {
     end
 
     if astro.is_available "toggleterm.nvim" then
-      local toggleterm_in_direction = function(state, direction)
+      local function toggleterm_in_direction(state, direction)
         local node = state.tree:get_node()
         local path = node.type == "file" and node:get_parent_id() or node:get_id()
         require("toggleterm.terminal").Terminal:new({ dir = path, direction = direction }):toggle()

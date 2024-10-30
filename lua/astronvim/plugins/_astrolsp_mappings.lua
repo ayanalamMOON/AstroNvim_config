@@ -3,12 +3,18 @@ return {
   ---@param opts AstroLSPOpts
   opts = function(_, opts)
     local maps = require("astrocore").empty_map_table()
+    maps.n["<Leader>l"] = { desc = require("astroui").get_icon("ActiveLSP", 1, true) .. "Language Tools" }
     maps.v["<Leader>l"] = { desc = require("astroui").get_icon("ActiveLSP", 1, true) .. "Language Tools" }
 
     maps.n["<Leader>la"] =
-      { function() vim.lsp.buf.code_action() end, desc = "LSP code action", cond = "testDocument/codeAction" }
+      { function() vim.lsp.buf.code_action() end, desc = "LSP code action", cond = "textDocument/codeAction" }
     maps.x["<Leader>la"] =
-      { function() vim.lsp.buf.code_action() end, desc = "LSP code action", cond = "testDocument/codeAction" }
+      { function() vim.lsp.buf.code_action() end, desc = "LSP code action", cond = "textDocument/codeAction" }
+    maps.n["<Leader>lA"] = {
+      function() vim.lsp.buf.code_action { context = { only = { "source" }, diagnostics = {} } } end,
+      desc = "LSP source action",
+      cond = "textDocument/codeAction",
+    }
 
     maps.n["<Leader>ll"] =
       { function() vim.lsp.codelens.refresh() end, desc = "LSP CodeLens refresh", cond = "textDocument/codeLens" }
@@ -31,20 +37,24 @@ return {
       cond = "textDocument/definition",
     }
 
-    local formatting_enabled = function(client)
-      local disabled = opts.formatting.disabled
-      return client.supports_method "textDocument/formatting"
-        and disabled ~= true
-        and not vim.tbl_contains(disabled, client.name)
+    local function formatting_checker(method)
+      method = "textDocument/" .. (method or "formatting")
+      return function(client)
+        local disabled = opts.formatting.disabled
+        return client.supports_method(method) and disabled ~= true and not vim.tbl_contains(disabled, client.name)
+      end
     end
+    local formatting_enabled = formatting_checker()
     maps.n["<Leader>lf"] = {
-      function()
-        vim.lsp.buf.format(require("astrolsp").format_opts --[[@as vim.lsp.buf.format.Opts?]])
-      end,
+      function() vim.lsp.buf.format(require("astrolsp").format_opts) end,
       desc = "Format buffer",
       cond = formatting_enabled,
     }
-    maps.v["<Leader>lf"] = maps.n["<Leader>lf"]
+    maps.v["<Leader>lf"] = {
+      function() vim.lsp.buf.format(require("astrolsp").format_opts) end,
+      desc = "Format buffer",
+      cond = formatting_checker "rangeFormatting",
+    }
     maps.n["<Leader>uf"] = {
       function() require("astrolsp.toggles").buffer_autoformat() end,
       desc = "Toggle autoformatting (buffer)",
@@ -54,6 +64,12 @@ return {
       function() require("astrolsp.toggles").autoformat() end,
       desc = "Toggle autoformatting (global)",
       cond = formatting_enabled,
+    }
+
+    maps.n["<Leader>u?"] = {
+      function() require("astrolsp.toggles").signature_help() end,
+      desc = "Toggle automatic signature help",
+      cond = "textDocument/signatureHelp",
     }
 
     -- TODO: Remove mapping after dropping support for Neovim v0.9, it's automatic

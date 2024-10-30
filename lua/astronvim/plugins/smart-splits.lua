@@ -1,7 +1,11 @@
+local term = vim.trim((vim.env.TERM_PROGRAM or ""):lower())
+local mux = term == "tmux" or term == "wezterm" or vim.env.KITTY_LISTEN_ON
+
 return {
   "mrjones2014/smart-splits.nvim",
-  event = "VeryLazy", -- load on very lazy for mux detection
-  dependencies = {
+  lazy = true,
+  event = mux and "VeryLazy" or nil, -- load early if mux detected
+  specs = {
     {
       "AstroNvim/astrocore",
       opts = function(_, opts)

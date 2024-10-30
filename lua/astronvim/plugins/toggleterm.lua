@@ -1,7 +1,7 @@
 return {
   "akinsho/toggleterm.nvim",
   cmd = { "ToggleTerm", "TermExec" },
-  dependencies = {
+  specs = {
     {
       "AstroNvim/astrocore",
       opts = function(_, opts)
@@ -15,7 +15,7 @@ return {
               local worktree = astro.file_worktree()
               local flags = worktree and (" --work-tree=%s --git-dir=%s"):format(worktree.toplevel, worktree.gitdir)
                 or ""
-              astro.toggle_term_cmd("lazygit " .. flags)
+              astro.toggle_term_cmd { cmd = "lazygit " .. flags, direction = "float" }
             end,
             desc = "ToggleTerm lazygit",
           }
@@ -28,10 +28,12 @@ return {
         local gdu = vim.fn.has "mac" == 1 and "gdu-go" or "gdu"
         if vim.fn.has "win32" == 1 and vim.fn.executable(gdu) ~= 1 then gdu = "gdu_windows_amd64.exe" end
         if vim.fn.executable(gdu) == 1 then
-          maps.n["<Leader>tu"] = { function() astro.toggle_term_cmd(gdu) end, desc = "ToggleTerm gdu" }
+          maps.n["<Leader>tu"] =
+            { function() astro.toggle_term_cmd { cmd = gdu, direction = "float" } end, desc = "ToggleTerm gdu" }
         end
         if vim.fn.executable "btm" == 1 then
-          maps.n["<Leader>tt"] = { function() astro.toggle_term_cmd "btm" end, desc = "ToggleTerm btm" }
+          maps.n["<Leader>tt"] =
+            { function() astro.toggle_term_cmd { cmd = "btm", direction = "float" } end, desc = "ToggleTerm btm" }
         end
         local python = vim.fn.executable "python" == 1 and "python" or vim.fn.executable "python3" == 1 and "python3"
         if python then
@@ -43,10 +45,10 @@ return {
         maps.n["<Leader>tv"] = { "<Cmd>ToggleTerm size=80 direction=vertical<CR>", desc = "ToggleTerm vertical split" }
         maps.n["<F7>"] = { '<Cmd>execute v:count . "ToggleTerm"<CR>', desc = "Toggle terminal" }
         maps.t["<F7>"] = { "<Cmd>ToggleTerm<CR>", desc = "Toggle terminal" }
-        maps.i["<F7>"] = { "<Esc><Cmd>ToggleTerm<CR>", desc = "Toggle terminl" }
+        maps.i["<F7>"] = { "<Esc><Cmd>ToggleTerm<CR>", desc = "Toggle terminal" }
         maps.n["<C-'>"] = { '<Cmd>execute v:count . "ToggleTerm"<CR>', desc = "Toggle terminal" } -- requires terminal that supports binding <C-'>
         maps.t["<C-'>"] = { "<Cmd>ToggleTerm<CR>", desc = "Toggle terminal" } -- requires terminal that supports binding <C-'>
-        maps.i["<C-'>"] = { "<Esc><Cmd>ToggleTerm<CR>", desc = "Toggle terminl" } -- requires terminal that supports binding <C-'>
+        maps.i["<C-'>"] = { "<Esc><Cmd>ToggleTerm<CR>", desc = "Toggle terminal" } -- requires terminal that supports binding <C-'>
       end,
     },
   },
@@ -67,13 +69,12 @@ return {
       vim.opt_local.foldcolumn = "0"
       vim.opt_local.signcolumn = "no"
       if t.hidden then
-        local toggle = function() t:toggle() end
+        local function toggle() t:toggle() end
         vim.keymap.set({ "n", "t", "i" }, "<C-'>", toggle, { desc = "Toggle terminal", buffer = t.bufnr })
         vim.keymap.set({ "n", "t", "i" }, "<F7>", toggle, { desc = "Toggle terminal", buffer = t.bufnr })
       end
     end,
     shading_factor = 2,
-    direction = "float",
     float_opts = { border = "rounded" },
   },
 }

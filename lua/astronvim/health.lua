@@ -10,7 +10,7 @@ local M = {}
 local health = vim.health
 
 function M.check()
-  health.start "AstroNvim"
+  health.start "Checking requirements"
 
   health.info("AstroNvim Version: " .. require("astronvim").version())
   health.info("Neovim Version: v" .. vim.fn.matchstr(vim.fn.execute "version", "NVIM v\\zs[^\n]*"))
