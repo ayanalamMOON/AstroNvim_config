@@ -48,6 +48,8 @@ function M.check()
     },
     { cmd = { "btm" }, type = "warn", msg = "Used for mappings to pull up system monitor (Optional)" },
     { cmd = { "python", "python3" }, type = "warn", msg = "Used for mappings to pull up python REPL (Optional)" },
+    { cmd = { "tree-sitter" }, type = "warn", msg = "Used for Treesitter `auto_install` feature (Optional)" },
+    { cmd = { "xclip", "xsel", "pbcopy", "wl-copy" }, type = "warn", msg = "Used for system clipboard integration (Optional)" },
   }
 
   for _, program in ipairs(programs) do
